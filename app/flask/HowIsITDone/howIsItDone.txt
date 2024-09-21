@@ -1,0 +1,38 @@
+1- crear un entorno virtual para carga el frameWork flask
+    python -m venv nombre_del_entorno
+2- activar el entorno
+    en windows: nombre_del_entorno\Scripts\activate
+    en linux o Mac: source nombre_del_entorno/bin/activate
+3- una vez activado instalamos flask  en él
+    pip install flask
+4- verificar 
+    flask --version
+5- guardamos las requirements
+    pip freeze > requirements.txt
+
+Ya lo tenemos instalado ahora nos crear.
+1- creamos un archivo XXXX.py
+2- importamos flask y lo instanciamos
+   from flask import Flask
+   app = Flask(__name__)
+3- creamos una ruta
+@app.route('/')
+def index():
+    return 'Hola mundo'
+
+Ejecutamos la aplicación en debug mode:
+ponte en el directorio de la aplicación en modo venv : (venv_of_flask) C:\Users\Francisco Martínez\Documents\filePython\app\flask>
+flask --app server --debug run
+ahora puede abrir otra terminal y probar con un curl:
+curl -X GET -i -w '\n' localhost:5000
+
+resultado: 
+HTTP/1.1 200 OK
+Server: Werkzeug/3.0.4 Python/3.10.6
+Date: Sat, 21 Sep 2024 09:42:11 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 13
+Connection: close
+
+Hello, World!'
+'

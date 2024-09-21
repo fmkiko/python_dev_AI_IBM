@@ -1,0 +1,6 @@
+poner el directorio raiz en este caso app en el PYTHONPATH
+en windows:
+cmd:
+set PYTHONPATH=C:/Users/Francisco Martínez/Documents/filePython/app
+POwerShell:
+$env:PYTHONPATH = "C:/Users/Francisco Martínez/Documents/filePython/app"

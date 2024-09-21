@@ -1,0 +1,22 @@
+1- crear una carpeta("directorio)
+   mkdir my_package
+2- poner los módulos(files python) dentro del directorio, de la carpeta creada
+   
+3- crear un archivo llamado `__init__.py` dentro del directorio, este archivo debe 
+contener la importaciones de los módulos
+  from nombreModulo import nombreFunción
+  ó
+  import nombreModulo
+4- comprobar importamos el paquete la carpeta.
+    import my_package
+
+    si usemos el import nombreModulo:
+        my_package.nombreModulo.nombreFunción()
+    si usemos el from nombreModulo import nombreFunción
+        my_package.nombreFunción()
+
+Como se ve el paquete:
+- carpeta base (my_package)
+   - archivo `__init__.py`
+   - archivo modulo1.py
+   - archivo modulo2.py

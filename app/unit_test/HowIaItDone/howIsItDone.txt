@@ -1,0 +1,15 @@
+1- importar unittest
+   import unittest
+2- crea una clase que herede de unittest.TestCase
+3- crea los métodos para la pruebas recuerda (self) esta en una clase por lo que para hacer la referencia a this usas selt
+4- pon los self.assertXXX para el TestCase
+5- ejecuta el test con unittest.main() 
+
+ej: 
+class MyUnitTest(unittest.TestCase):
+    def test_suma(self):
+       self.assertEqual(2 + 2, 4)
+    def test_multiplicacion(self):
+       self.assertEqual(2 * 2, 4)
+if __name__ == '__main__'
+    unittest.main()
