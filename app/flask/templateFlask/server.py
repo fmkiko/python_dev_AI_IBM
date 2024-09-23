@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 # Import the Maths package here
 from Maths.mathematics import summation, subtraction, multiplication
 
@@ -10,15 +10,18 @@ def sum_route():
     num2 = float(request.args.get('num2'))
     
     result = summation(num1, num2)
-    return result
+    return { "data": result }
 
 @app.route("/sub")
 def sub_route():
-    num1 = float(request.args.get('num1'))
-    num2 = float(request.args.get('num2'))
+    try:
+        num1 = float(request.args.get('num1'))
+        num2 = float(request.args.get('num2'))
+        result = subtraction(num1, num2)
+        return jsonify(data=result)
+    except Exception as e:
+        return {"error":str(e)}
     
-    result = subtraction(num1, num2)
-    return result
 
 @app.route("/mul")
 def mul_route():
@@ -26,7 +29,7 @@ def mul_route():
     num2 = float(request.args.get('num2'))
     
     result = multiplication(num1, num2) 
-    return result
+    return jsonify(data=result)
 
 @app.route("/")
 def render_index_page():
