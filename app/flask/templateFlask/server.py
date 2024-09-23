@@ -23,13 +23,19 @@ def sub_route():
         return {"error":str(e)}
     
 
-@app.route("/mul")
+@app.route("/mul", methods=["POST"])
 def mul_route():
-    num1 = float(request.args.get('num1'))
-    num2 = float(request.args.get('num2'))
-    
-    result = multiplication(num1, num2) 
-    return jsonify(data=result)
+    data = request.get_json()
+    if data and 'num1' in data and 'num2' in data:
+        try:
+            num1 = float(data['num1'])
+            num2 = float(data['num2'])
+            result = multiplication(num1, num2)
+            return jsonify(data=result)
+        except ValueError:
+            return jsonify(error="Invalid input. num1 and num2 must be numbers."), 400
+    else:
+        return jsonify(error="Missing required parameters 'num1' or 'num2'"), 400
 
 @app.route("/")
 def render_index_page():
