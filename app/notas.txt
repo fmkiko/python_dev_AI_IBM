@@ -1,3 +1,11 @@
+Crear entorno:
+python -m venv nombre_entorno
+Activar el entorno:
+nombre_entorno\Scripts\activate
+salir del entorno:
+deactivate
+
+
 poner el directorio raiz en este caso app en el PYTHONPATH
 en windows:
 cmd:

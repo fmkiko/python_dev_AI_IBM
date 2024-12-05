@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punto 6: Pruebas Retroactivas (Backtesting)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        pre {
+            background: #eee;
+            padding: 15px;
+            border-radius: 5px;
+            overflow: auto;
+        }
+        code {
+            font-family: "Courier New", Courier, monospace;
+            color: #d63384;
+        }
+        ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        .note {
+            background: #e7f3fe;
+            padding: 10px;
+            border-left: 5px solid #2196f3;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Punto 6: Pruebas Retroactivas (Backtesting)</h1>
+        <p>El backtesting permite evaluar la viabilidad de una estrategia de trading utilizando datos históricos. Esto ayuda a determinar si una estrategia habría sido rentable en el pasado y si tiene potencial para generar ganancias futuras.</p>
+
+        <h2>6.1. Configuración Inicial</h2>
+        <p>Definimos las condiciones iniciales del simulador:</p>
+        <pre><code>
+# Definir el balance inicial en USD
+initial_balance = 10000.0
+
+# Crear un DataFrame para almacenar los cálculos de backtesting
+backtest = pd.DataFrame(index=trade_signals.index)
+        </code></pre>
+
+        <h2>6.2. Cálculo de Retornos Diarios</h2>
+        <p>Los retornos diarios representan el cambio porcentual en el precio de Bitcoin de un día al siguiente. Se calculan así:</p>
+        <pre><code>
+# Retorno diario = Precio de cierre actual / Precio de cierre del día anterior
+backtest['BTC_Return'] = BTC_USD['Close'] / BTC_USD['Close'].shift(1)
+        </code></pre>
+        <p>Ejemplo:</p>
+        <ul>
+            <li>Si el precio de Bitcoin hoy es 50,000 USD y ayer fue 48,000 USD, el retorno sería: <code>50,000 / 48,000 = 1.0417</code> (un 4.17% de ganancia).</li>
+            <li>Si el precio baja de 50,000 USD a 48,000 USD, el retorno sería: <code>48,000 / 50,000 = 0.96</code> (una pérdida del 4%).</li>
+        </ul>
+
+        <h2>6.3. Retornos del Algoritmo</h2>
+        <p>El algoritmo alterna entre dos estados:</p>
+        <ul>
+            <li><b>Posición en Bitcoin:</b> Si la señal es 1, sigue los retornos de Bitcoin.</li>
+            <li><b>Posición en USD:</b> Si la señal es 0, el retorno es 1 (sin cambios en el balance).</li>
+        </ul>
+        <pre><code>
+# Retorno del algoritmo según las señales de trading
+backtest['Alg_Return'] = np.where(trade_signals['Signal'] == 1, backtest['BTC_Return'], 1.0)
+        </code></pre>
+
+        <h2>6.4. Balance Acumulado</h2>
+        <p>El balance acumulado se calcula multiplicando el balance inicial por los retornos acumulados del algoritmo:</p>
+        <pre><code>
+# Balance acumulado = Balance inicial * Producto acumulado de retornos del algoritmo
+backtest['Balance'] = initial_balance * backtest['Alg_Return'].cumprod()
+        </code></pre>
+        <p>La función <code>cumprod()</code> calcula el producto acumulado, simulando cómo crece (o decrece) el portafolio día a día.</p>
+
+        <h2>6.5. Comparación con "Comprar y Mantener"</h2>
+        <p>Comparamos el rendimiento del algoritmo con una estrategia básica de "Comprar y Mantener", donde todo el balance inicial se invierte en Bitcoin desde el principio:</p>
+        <pre><code>
+# Balance de "Comprar y Mantener"
+buy_and_hold = initial_balance * backtest['BTC_Return'].cumprod()
+        </code></pre>
+
+        <h2>6.6. Visualización de Resultados</h2>
+        <p>Graficamos el balance acumulado del algoritmo y la estrategia de "Comprar y Mantener" para visualizar su desempeño:</p>
+        <pre><code>
+import matplotlib.pyplot as plt
+
+# Crear gráfico comparativo
+fig, ax = plt.subplots(dpi=100)
+
+# Graficar el balance de "Comprar y Mantener"
+ax.plot(buy_and_hold, label='Comprar y Mantener', alpha=0.75)
+
+# Graficar el balance del algoritmo
+ax.plot(backtest['Balance'], label='Algoritmo', alpha=0.75)
+
+# Configurar etiquetas y leyendas
+ax.set_title('Comparación de Estrategias')
+ax.set_ylabel('Valor del Portafolio (USD)')
+ax.legend()
+plt.show()
+        </code></pre>
+
+        <h2>6.7. Análisis de Resultados</h2>
+        <p>El gráfico muestra:</p>
+        <ul>
+            <li><b>Comprar y Mantener:</b> Refleja el rendimiento de Bitcoin durante todo el periodo.</li>
+            <li><b>Estrategia del Algoritmo:</b> Reduce el riesgo durante periodos bajistas, evitando pérdidas al cambiar a USD.</li>
+        </ul>
+        <div class="note">
+            <p><strong>Nota:</strong> Si el mercado es consistentemente alcista, la estrategia de "Comprar y Mantener" puede superar al algoritmo. Sin embargo, en mercados laterales o bajistas, el algoritmo puede ser más eficiente.</p>
+        </div>
+
+        <h2>6.8. Consejos para Mejorar el Backtesting</h2>
+        <ul>
+            <li><b>Probar diferentes periodos:</b> Cambia las fechas iniciales y finales para evaluar la estrategia en mercados alcistas y bajistas.</li>
+            <li><b>Incluir costos reales:</b> Simula comisiones y deslizamientos (slippage) en las transacciones.</li>
+            <li><b>Evitar sobreajuste:</b> No ajustes los parámetros para maximizar los resultados en un periodo específico.</li>
+            <li><b>Pruebas en tiempo real:</b> Usa datos en tiempo real con "dinero ficticio" antes de implementar la estrategia con dinero real.</li>
+        </ul>
+
+        <div class="note">
+            <p><strong>Precaución:</strong> El backtesting no garantiza éxito futuro. Asegúrate de validar tus resultados con datos actuales y pruebas en tiempo real.</p>
+        </div>
+    </div>
+</body>
+</html>

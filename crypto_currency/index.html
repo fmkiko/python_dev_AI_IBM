@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creación de un Algoritmo de Trading de Criptomonedas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        pre {
+            background: #eee;
+            padding: 15px;
+            border-radius: 5px;
+            overflow: auto;
+        }
+        code {
+            font-family: "Courier New", Courier, monospace;
+            color: #d63384;
+        }
+        ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        .note {
+            background: #e7f3fe;
+            padding: 10px;
+            border-left: 5px solid #2196f3;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Creación de un Algoritmo de Trading de Criptomonedas</h1>
+        <p>Este tutorial describe cómo crear un algoritmo de trading para criptomonedas utilizando Python. Aprenderás a obtener datos históricos del mercado, realizar análisis básicos y desarrollar una estrategia automatizada para tomar decisiones de compra y venta basadas en criterios predefinidos.</p>
+
+        <h2>Introducción</h2>
+        <p>El trading de criptomonedas ha crecido exponencialmente, pero requiere un monitoreo constante de gráficos y precios. Un enfoque automatizado, como el uso de algoritmos, puede simplificar este proceso y potencialmente generar ganancias de forma eficiente.</p>
+
+        <h3>¿Qué aprenderás?</h3>
+        <ul>
+            <li>Obtener datos del mercado de criptomonedas.</li>
+            <li>Realizar análisis básicos de comportamiento del mercado.</li>
+            <li>Implementar una estrategia de trading algorítmico simple.</li>
+            <li>Evaluar el rendimiento del algoritmo con pruebas retroactivas (backtesting).</li>
+        </ul>
+
+        <h2>1. Obtener Datos del Mercado</h2>
+        <p>Utilizaremos la biblioteca <code>yfinance</code> para descargar datos históricos del mercado de Bitcoin.</p>
+        <pre><code>
+# Instalar yfinance si no lo tienes instalado:
+# pip install yfinance
+
+import yfinance as yf
+
+# Descargar datos de Bitcoin para 2020 con un intervalo diario
+BTC_USD = yf.download("BTC-USD", start='2020-01-01', end='2020-12-31', interval='1d')
+
+# Visualizar las primeras filas del conjunto de datos
+print(BTC_USD.head())
+        </code></pre>
+
+        <h2>2. Visualizar Datos</h2>
+        <p>Para entender mejor el comportamiento del mercado, crearemos un gráfico de precios usando <code>matplotlib</code>.</p>
+        <pre><code>
+import matplotlib.pyplot as plt
+
+# Crear gráfico de precios
+plt.figure(dpi=100)
+plt.plot(BTC_USD['Close'], label='Precio de Cierre')
+plt.title('Precio de Bitcoin (USD) - 2020')
+plt.xlabel('Fecha')
+plt.ylabel('Precio (USD)')
+plt.legend()
+plt.grid()
+plt.show()
+        </code></pre>
+
+        <h2>3. Análisis Básico: Medias Móviles</h2>
+        <p>Las medias móviles suavizan las fluctuaciones de precios a corto plazo para revelar tendencias a largo plazo. Calcularemos una media móvil de 9 días y otra de 30 días.</p>
+        <pre><code>
+# Calcular medias móviles
+BTC_USD['SMA_9'] = BTC_USD['Close'].rolling(window=9).mean()
+BTC_USD['SMA_30'] = BTC_USD['Close'].rolling(window=30).mean()
+
+# Visualizar las primeras filas con las nuevas columnas
+print(BTC_USD[['Close', 'SMA_9', 'SMA_30']].head(15))
+        </code></pre>
+
+        <h2>4. Estrategia: Cruce de Medias Móviles</h2>
+        <p>La estrategia consiste en:</p>
+        <ul>
+            <li><b>Comprar</b> cuando la SMA de corto plazo cruza hacia arriba la SMA de largo plazo.</li>
+            <li><b>Vender</b> cuando la SMA de corto plazo cruza hacia abajo la SMA de largo plazo.</li>
+        </ul>
+        <pre><code>
+import numpy as np
+
+# Crear señales de compra y venta
+trade_signals = pd.DataFrame(index=BTC_USD.index)
+trade_signals['Short'] = BTC_USD['SMA_9']
+trade_signals['Long'] = BTC_USD['SMA_30']
+trade_signals['Signal'] = np.where(trade_signals['Short'] > trade_signals['Long'], 1.0, 0.0)
+trade_signals['Position'] = trade_signals['Signal'].diff()
+        </code></pre>
+
+        <h2>5. Visualización de Señales</h2>
+        <p>Graficaremos las señales de compra y venta sobre el gráfico de precios.</p>
+        <pre><code>
+fig, ax = plt.subplots(dpi=100)
+ax.plot(BTC_USD['Close'], label='Precio de Cierre')
+ax.plot(BTC_USD['SMA_9'], label='SMA 9 días', alpha=0.7)
+ax.plot(BTC_USD['SMA_30'], label='SMA 30 días', alpha=0.7)
+
+# Agregar señales de compra y venta
+ax.plot(trade_signals.loc[trade_signals['Position'] == 1.0].index,
+        trade_signals['Short'][trade_signals['Position'] == 1.0],
+        '^', markersize=10, color='g', label='Compra')
+ax.plot(trade_signals.loc[trade_signals['Position'] == -1.0].index,
+        trade_signals['Short'][trade_signals['Position'] == -1.0],
+        'v', markersize=10, color='r', label='Venta')
+
+ax.set_title('Señales de Trading')
+ax.legend()
+plt.show()
+        </code></pre>
+
+        <h2>6. Pruebas Retroactivas (Backtesting)</h2>
+        <p>Simulamos el desempeño de la estrategia utilizando datos históricos. Esto incluye:</p>
+        <ul>
+            <li>Calcular retornos diarios.</li>
+            <li>Evaluar el balance acumulado del portafolio.</li>
+            <li>Comparar con una estrategia de "Comprar y Mantener".</li>
+        </ul>
+        <pre><code>
+initial_balance = 10000.0  # USD iniciales
+
+# Calcular retornos
+backtest = pd.DataFrame(index=trade_signals.index)
+backtest['BTC_Return'] = BTC_USD['Close'] / BTC_USD['Close'].shift(1)
+backtest['Alg_Return'] = np.where(trade_signals['Signal'] == 1, backtest['BTC_Return'], 1.0)
+backtest['Balance'] = initial_balance * backtest['Alg_Return'].cumprod()
+
+# Estrategia "Comprar y Mantener"
+buy_and_hold = initial_balance * backtest['BTC_Return'].cumprod()
+        </code></pre>
+
+        <h2>7. Visualización de Resultados</h2>
+        <p>Comparamos el rendimiento del algoritmo con la estrategia de "Comprar y Mantener".</p>
+        <pre><code>
+fig, ax = plt.subplots(dpi=100)
+ax.plot(buy_and_hold, label='Comprar y Mantener', alpha=0.75)
+ax.plot(backtest['Balance'], label='Algoritmo', alpha=0.75)
+ax.set_title('Comparación de Estrategias')
+ax.legend()
+plt.show()
+        </code></pre>
+
+        <h2>Conclusión</h2>
+        <p>El backtesting mostró cómo la estrategia puede evitar pérdidas en mercados bajistas y potencialmente generar beneficios. Sin embargo, es fundamental probarla en tiempo real antes de implementarla con dinero real.</p>
+    </div>
+</body>
+</html>
