@@ -1,5 +1,7 @@
 venv_of_flask/
-whisper_env/
+
 ia/
 ia_env/
 crypto_env/
+whisper_env/
+lab4_env/
