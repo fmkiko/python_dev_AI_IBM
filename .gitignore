@@ -9,4 +9,5 @@ lab5_env/
 lab6_env/
 analizar_ficheros_env/
 
-app/analizar_ficheros_env/ficheros/*
+*.csv
+*.xls

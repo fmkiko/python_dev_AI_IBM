@@ -61,9 +61,9 @@ if __name__ == "__main__":
     print("Programa para convertir .xls a .csv y realizar consultas en un DataFrame.")
 
     # Solicitar rutas
-    path_xls = "./ficheros/xls/TT221124.139_2021.XLS"
+    path_xls = './ficheros/xls/TT120125.464_2019.XLS' #"./ficheros/xls/TT221124.139_2021.XLS"
     xls_file = path_xls 
-    csv_file = "./ficheros/csv/TT221124.139_2021.csv"
+    csv_file = "./ficheros/csv/TT120125.464_2019.csv"
 
     # Convertir el archivo
     convert_xls_to_csv(xls_file, csv_file)
@@ -76,10 +76,10 @@ if __name__ == "__main__":
         print(df.columns.tolist())
 
         # Filtrar filas que tienen valor en la columna "Ingreso (+)"
-        df = df.dropna(subset=["Ingreso (+)"])
+        #df = df.dropna(subset=["Ingreso (+)"])
 
         # Seleccionar columnas para consulta
-        columns = ["F. Operación","Ingreso (+)", "Concepto complementario 1",  ] #input("Ingrese las columnas a seleccionar (separadas por comas): ").split(",")
+        columns = ["F. Operación","Ingreso (+)", "Gasto (-)", "Concepto complementario 1",  ] #input("Ingrese las columnas a seleccionar (separadas por comas): ").split(",")
         columns = [col.strip() for col in columns]  # Eliminar espacios extra
 
         filtered_df = filter_dataframe_columns(df, columns)

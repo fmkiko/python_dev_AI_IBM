@@ -1,0 +1,29 @@
+Leer el archivo CSV que contiene un conjunto de datos en un marco de datos de pandas
+    df = pd.read_csv(<CSV_path>, header = None) 
+    # cargar sin encabezado 
+    df = pd.read_csv(<CSV_path>, header = 0) 
+    # cargar usando la primera fila como encabezado
+
+Imprimir las primeras entradas (por defecto 5) del marco de datos de pandas
+    df.head(n) #n=número de entradas; por defecto 5
+
+Imprimir las últimas entradas (por defecto 5) del marco de datos de pandas
+    df.tail(n) #n=número de entradas; por defecto 5
+
+Asignar nombres de encabezado apropiados al marco de datos
+    df.columns = headers
+
+Reemplazar las entradas "?" con la entrada NaN de la biblioteca Numpy
+    df = df.replace("?", np.nan)
+
+Recuperar los tipos de datos de las columnas del marco de datos
+    df.dtypes
+
+Recuperar la descripción estadística del conjunto de datos. El uso predeterminado es solo para tipos de datos numéricos. Usa include="all" para crear un resumen de todas las variables
+    df.describe() #uso predeterminado df.describe(include="all")
+
+Recuperar el resumen del conjunto de datos que se está utilizando, desde el marco de datos
+    df.info()
+
+Guardar el marco de datos procesado en un archivo CSV con una ruta especificada
+    df.to_csv(<output CSV path>)
